@@ -25,7 +25,7 @@ export class Model<T extends ModelInterface, CreateDto, UpdateDto> {
   }
 
   findOne(id: number) {
-    if (this.itemExists(id)) {
+    if (!this.itemExists(id)) {
       throw new NotFoundException(`This Element does not exist`);
     }
     const item = this.items.find((el) => el.id === id);
@@ -33,7 +33,7 @@ export class Model<T extends ModelInterface, CreateDto, UpdateDto> {
   }
 
   update(id: number, updateDto: UpdateDto) {
-    if (this.itemExists(id)) {
+    if (!this.itemExists(id)) {
       throw new NotFoundException(`This Element does not exist`);
     }
     const item = this.findOne(id) as T & CreateDto;
@@ -46,7 +46,7 @@ export class Model<T extends ModelInterface, CreateDto, UpdateDto> {
   }
 
   remove(id: number) {
-    if (this.itemExists(id)) {
+    if (!this.itemExists(id)) {
       throw new NotFoundException(`This Element does not exist`);
     }
     const index = this.items.findIndex((product) => product.id === id);
