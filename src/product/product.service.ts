@@ -1,59 +1,61 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
-import { responseDelete } from 'src/helpers/response.helper';
+import { Model } from 'src/helpers/model.interface';
+import { CategoriesService } from './relations/categories/categories.service';
+import { BrandService } from './relations/brand/brand.service';
 
 @Injectable()
-export class ProductService {
-  private counterId = 1;
-  private products: Product[] = [];
-
+export class ProductService extends Model<
+  Product,
+  CreateProductDto,
+  UpdateProductDto
+> {
+  constructor(
+    private categoriesService: CategoriesService,
+    private brandService: BrandService,
+  ) {
+    super();
+    this.table = 'Product';
+  }
   create(createProductDto: CreateProductDto) {
-    const newProduct: Product = {
-      id: this.counterId,
-      ...createProductDto,
-    };
-    this.counterId++;
-    this.products.push(newProduct);
-    return newProduct;
+    this.categoriesService.findOne(createProductDto.category_id);
+    this.brandService.findOne(createProductDto.brand_id);
+    return super.create(createProductDto);
   }
 
   findAll() {
-    return this.products;
+    this.items = this.items.map((item) => {
+      return {
+        ...item,
+        brand: this.brandService.findOne(item.brand_id),
+        category: this.categoriesService.findOne(item.category_id),
+      };
+    });
+    return super.findAll();
   }
 
   findOne(id: number) {
     if (!this.itemExists(id)) {
-      throw new NotFoundException(`Product ${id} not exists`);
+      super.findOne(id);
     }
-    return this.products.find((product) => product.id === id);
+    const index = this.items.findIndex((item) => item.id === id);
+    const item = this.items.find((item) => item.id === id);
+    this.items[index] = {
+      ...item,
+      brand: this.brandService.findOne(item.brand_id),
+      category: this.categoriesService.findOne(item.category_id),
+    };
+    return super.findOne(id);
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
     if (!this.itemExists(id)) {
-      throw new NotFoundException(`Product ${id} not exists`);
+      super.findOne(id);
     }
-    const product: Product = this.findOne(id);
-    const index = this.products.findIndex((product) => product.id === id);
-    this.products[index] = {
-      ...product,
-      ...updateProductDto,
-    };
-    return this.products[index];
-  }
-
-  remove(id: number) {
-    if (!this.itemExists(id)) {
-      throw new NotFoundException(`Product ${id} not exists`);
-    }
-    const index = this.products.findIndex((product) => product.id === id);
-    this.products.splice(index, 1);
-    return responseDelete();
-  }
-
-  private itemExists(id: number): boolean {
-    const index = this.products.findIndex((product) => product.id === id);
-    return index !== -1;
+    this.categoriesService.findOne(updateProductDto.category_id);
+    this.brandService.findOne(updateProductDto.brand_id);
+    return super.update(id, updateProductDto);
   }
 }

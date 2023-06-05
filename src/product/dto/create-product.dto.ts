@@ -1,4 +1,5 @@
 import {
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsPositive,
@@ -28,4 +29,12 @@ export class CreateProductDto {
   @IsPositive()
   @IsNotEmpty()
   readonly stock: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly brand_id: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly category_id: number;
 }

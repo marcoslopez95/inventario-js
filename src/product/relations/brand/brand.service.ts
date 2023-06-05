@@ -5,8 +5,9 @@ import { Brand } from './entities/brand.entity';
 import { Model } from 'src/helpers/model.interface';
 
 @Injectable()
-export class BrandService extends Model<
-  Brand,
-  CreateBrandDto,
-  UpdateBrandDto
-> {}
+export class BrandService extends Model<Brand, CreateBrandDto, UpdateBrandDto> {
+  constructor() {
+    super();
+    this.table = 'Brand Product';
+  }
+}

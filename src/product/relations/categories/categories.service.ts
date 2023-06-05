@@ -9,4 +9,9 @@ export class CategoriesService extends Model<
   Category,
   CreateCategoryDto,
   UpdateCategoryDto
-> {}
+> {
+  constructor() {
+    super();
+    this.table = 'Category Product';
+  }
+}
