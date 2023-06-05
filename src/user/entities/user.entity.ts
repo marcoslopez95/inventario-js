@@ -1,7 +1,7 @@
 export class User {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-  role: string;
+  readonly id: number;
+  readonly name: string;
+  readonly email: string;
+  readonly password: string;
+  readonly role: string;
 }
