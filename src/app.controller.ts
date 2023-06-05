@@ -6,17 +6,14 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return 'Hola mundo!';
+  getHello(): { message: string } {
+    return this.initApi();
   }
 
-  @Get('nuevo')
-  newEndpoint() {
-    return 'yo soy nuevo';
-  }
-
-  @Get('/ruta/')
-  hello() {
-    return 'con /sas/';
+  @Get('api')
+  initApi(): { message: string } {
+    return {
+      message: 'Hello World!',
+    };
   }
 }
