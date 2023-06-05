@@ -1,26 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
+  private counterId = 1;
+  private users: User[] = [
+    {
+      id: 1,
+      name: 'mo',
+      email: 'mio@gmail.com',
+      password: '123456',
+      role: 'admin',
+    },
+  ];
+
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    this.counterId++;
+    const newUser: User = {
+      id: this.counterId,
+      ...createUserDto,
+    };
+    this.users.push(newUser);
+    return newUser;
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.users;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    const user = this.users.find((user) => user.id === id);
+
+    if (!user) {
+      throw new NotFoundException(`The user ${id} not exits`);
+    }
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = this.findOne(id);
+    const index = this.users.findIndex((item: User) => item.id === id);
+    this.users[index] = {
+      ...user,
+      ...updateUserDto,
+    };
+    return this.users[index];
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    this.findOne(id);
+    const index = this.users.findIndex((item: User) => item.id === id);
+    this.users.splice(index, 1);
+    return {
+      message: 'Deleted Successfull',
+    };
   }
 }
